@@ -273,5 +273,5 @@ class Sim {
 }
 
 export {
-    Sim,
+    Sim, SimOptions,
 };
