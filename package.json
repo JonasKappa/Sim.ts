@@ -1,0 +1,11 @@
+{
+  "name": "sim.ts",
+  "version": "1.0.0",
+  "description": "A library heavily based on the [Sim.js lib](https://simjs.z5.web.core.windows.net/). In fact, Sim.js was downloaded and rewritten into typescipt. It does not support all the features of the original library, because some raised errors and were not needed anyways.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jonas Kappa",
+  "license": "SEE LICENSE IN LICENSE"
+}
