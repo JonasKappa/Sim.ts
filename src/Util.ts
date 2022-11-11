@@ -1,4 +1,8 @@
 /**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
+/**
  * 
  * @param time In ms
  */

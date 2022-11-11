@@ -1,3 +1,7 @@
+/**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
 import { SimDataSeries, SimTimeSeries } from './SimSeries';
 
 class SimPopulation {

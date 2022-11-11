@@ -1,3 +1,7 @@
+/**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
 import { Entity } from './Entity';
 import { SimEvent } from './SimEvent';
 

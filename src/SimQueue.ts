@@ -1,3 +1,7 @@
+/**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
 import { SimPopulation } from './SimPopulation';
 import { SimRequest } from './SimRequest';
 

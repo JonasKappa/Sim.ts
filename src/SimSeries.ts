@@ -1,4 +1,7 @@
-
+/**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
 /**
  * DataSeries
  * 

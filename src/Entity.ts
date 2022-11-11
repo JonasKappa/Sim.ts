@@ -1,3 +1,7 @@
+/**
+ * Author: Jonas Kappa (jkappa@gmx.de)
+ * License: LGPL
+ */
 import { Random } from './Random';
 import { Sim } from './Sim';
 import { SimBuffer } from './SimBuffer';

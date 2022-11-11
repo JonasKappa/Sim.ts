@@ -1,6 +1,6 @@
 # Sim.ts
 
-A library heavily based on the [Sim.js lib](https://simjs.z5.web.core.windows.net/). In fact, Sim.js was downloaded and rewritten into typescipt. It does not support all the features of the original library, because some raised errors and were not needed anyways.
+A library heavily based on the [Sim.js lib](https://simjs.z5.web.core.windows.net/), developed by Maneesh Varshney. In fact, Sim.js was downloaded and rewritten into typescipt. It does not support all the features of the original library, because some raised errors and were not needed anyways.
 
 ## License
 
@@ -23,3 +23,4 @@ The original library is licensed under the LGPL, so this lib is LGPL as well.
 - ARG_CHECK got removed entirely
 - removed the `processing discipline` from `SimFacility`. It raised errors, but wasn't needed anyways so it got removed
 - added a `getTop` method to the SimPQueue class
+- added some tests
