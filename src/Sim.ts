@@ -14,12 +14,19 @@ interface SimOptions {
     realTime?: boolean;
 }
 
+interface LoggableEntity {
+    name?: string;
+    id: number;
+}
+
 /**
  * Simulator Class
  */
 class Sim {
+    name = "Simulation";
+    id = 0;
     /** Current Time of Simulation */
-    simTime = 0;
+    simTime = -1;
     /** The time a second in the simulation should last in real time (ms) */
     timeStepDuration = 1000;
     /** The entities in the simulation */
@@ -55,7 +62,7 @@ class Sim {
      * @returns The current simTime
      */
     time(): number {
-        return this.simTime;
+        return Math.max(0, this.simTime);
     }
 
     /**
@@ -96,12 +103,6 @@ class Sim {
      * @returns The created entity
      */
     addEntity(entity: Entity, ...args: any[]): Entity {
-        // ARG_CHECK(arguments, 1, 1, Object);
-        // Verify that prototype has start function
-        if (!entity.start) {  // ARG CHECK
-            throw new Error('Entity prototype must have start() function defined'); // ARG CHECK
-        }  // ARG CHECK
-
         entity.sim = this;
         entity.id = this.entityId++;
         entity.setRandom(this.random);
@@ -151,6 +152,7 @@ class Sim {
         const endTime = options.endTime;
         const maxEvents = options.maxEvents || Infinity;
         const realTime = options.realTime || false;
+        this.simTime = 0;
         this.startSimulationTime = Date.now();
         let eventCount = 0;
 
@@ -251,23 +253,23 @@ class Sim {
      * @param message
      * @param entity
      */
-    log(message: string, entity: Entity): void {
+    log(message: string, entity?: LoggableEntity): void {
         if (!this.logger) return;
         let entityMsg = '';
         if (entity !== undefined) {
             if (entity.name) {
-                entityMsg = ' [' + entity.name + ']';
+                entityMsg = '[' + entity.name + ']';
             } else {
-                entityMsg = ' [' + entity.id + '] ';
+                entityMsg = '[' + entity.id + ']';
             }
         }
-        this.logger(this.simTime.toFixed(6)
+        this.logger((this.simTime < 0 ? "" : this.simTime.toFixed(6) + " ")
             + entityMsg
-            + '   '
+            + '\t'
             + message);
     }
 }
 
 export {
-    Sim, SimOptions,
+    Sim, SimOptions, LoggableEntity,
 };
