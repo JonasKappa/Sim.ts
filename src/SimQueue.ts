@@ -153,8 +153,10 @@ class SimPQueue {
      */
     greater(ro1: SimRequest<any>, ro2: SimRequest<any>): boolean {
         if (ro1.deliverAt > ro2.deliverAt) return true;
-        if (ro1.deliverAt == ro2.deliverAt)
-            return ro1.order > ro2.order;
+        if (ro1.deliverAt == ro2.deliverAt) {
+            if (ro1.priority < ro2.priority) return true;
+            if (ro1.priority == ro2.priority) return ro1.order > ro2.order;
+        }
         return false;
     }
 

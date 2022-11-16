@@ -24,6 +24,7 @@ class SimRequest<T> {
     filter!: (obj: any) => boolean;
     obj: any;
     order!: number;
+    priority: number = 0;
 
     /**
      *

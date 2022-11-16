@@ -21,6 +21,7 @@ abstract class Entity {
     protected random!: Random;
     public name!: string;
     public stats: SimPopulation = new SimPopulation();
+    public priority: number = 0;
     public abstract start(...args: any[]): void;
 
     // for callbacks
@@ -59,7 +60,7 @@ abstract class Entity {
             this,
             this.time(),
             this.time() + duration);
-
+        ro.priority = this.priority;
         this.sim.queue.insert(ro);
         return ro;
     }
@@ -70,7 +71,7 @@ abstract class Entity {
      */
     waitEvent(event: SimEvent): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.time(), 0);
-
+        ro.priority = this.priority;
         ro.source = event;
         event.addWaitList(ro);
         return ro;
@@ -82,7 +83,7 @@ abstract class Entity {
      */
     queueEvent(event: SimEvent): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
-
+        ro.priority = this.priority;
         ro.source = event;
         event.addQueue(ro);
         return ro;
@@ -95,6 +96,7 @@ abstract class Entity {
      */
     useFacility(facility: SimFacility, duration: number): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
+        ro.priority = this.priority;
         ro.source = facility;
         facility.use(duration, ro);
         return ro;
@@ -107,6 +109,7 @@ abstract class Entity {
      */
     putBuffer(buffer: SimBuffer, amount: number): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
+        ro.priority = this.priority;
         ro.source = buffer;
         buffer.put(amount, ro);
         return ro;
@@ -119,6 +122,7 @@ abstract class Entity {
      */
     getBuffer(buffer: SimBuffer, amount: number): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
+        ro.priority = this.priority;
         ro.source = buffer;
         buffer.get(amount, ro);
         return ro;
@@ -131,6 +135,7 @@ abstract class Entity {
      */
     putStore(store: SimStore<any>, obj: any): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
+        ro.priority = this.priority;
         ro.source = store;
         store.put(obj, ro);
         return ro;
@@ -143,6 +148,7 @@ abstract class Entity {
      */
     getStore(store: SimStore<any>, filter: (every: any) => boolean): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
+        ro.priority = this.priority;
         ro.source = store;
         store.get(filter, ro);
         return ro;
@@ -156,6 +162,7 @@ abstract class Entity {
      */
     send(message: any, delay: number, entities: Entity[]): void {
         const ro: SimRequest<Sim> = new SimRequest(this.sim, this.time(), this.time() + delay);
+        ro.priority = this.priority;
         ro.source = this;
         ro.msg = message;
         ro.data = entities;
