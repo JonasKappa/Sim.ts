@@ -43,6 +43,10 @@ abstract class Entity {
         return this.sim.time();
     }
 
+    logTime(): string {
+        return this.sim.getLogTime();
+    }
+
     /**
      * 
      * @param random 
