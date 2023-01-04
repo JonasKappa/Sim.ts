@@ -4,7 +4,7 @@
  */
 import { Entity } from "./Entity";
 import { Random } from "./Random";
-import { Sim, SimOptions } from "./Sim";
+import { DateOpts, DateTimeObject, DateTimeOpts, Sim, SimOptions } from "./Sim";
 import { SimBuffer } from "./SimBuffer";
 import { SimEvent } from "./SimEvent";
 import { SimFacility, SimFacilityDiscipline } from "./SimFacility";
@@ -31,5 +31,8 @@ export {
     formatTime,
     SimFacilityDiscipline,
     SimPQueue,
-    SimOptions
+    SimOptions, 
+    DateOpts, 
+    DateTimeObject, 
+    DateTimeOpts
 };

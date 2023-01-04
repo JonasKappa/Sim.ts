@@ -3,15 +3,45 @@
  * License: LGPL
  */
 
+import { DateTime } from 'luxon';
 import { Entity } from './Entity';
 import { Random } from './Random';
 import { SimPQueue } from './SimQueue';
 import { SimRequest } from './SimRequest';
 
+interface DateTimeObject {
+    year?: number;
+    month?: number;
+    day?: number;
+    ordinal?: number;
+    weekyear?: number;
+    weekNumber?: number;
+    weekday?: number;
+    hour?: number;
+    minute?: number;
+    second?: number;
+    millisecond?: number;
+}
+
+interface DateTimeOpts {
+    zone?: string;
+    locale?: string;
+    outputCalendar?: string;
+    numberingSystem?: string;
+}
+
+interface DateOpts {
+    dateTimeObject?: DateTimeObject;
+    dateTimeOpts?: DateTimeOpts;
+}
+
 interface SimOptions {
     endTime: number;
+    date?: DateOpts;
+    dateStep?: number;
     maxEvents?: number;
     realTime?: boolean;
+    logDate?: boolean;
 }
 
 interface LoggableEntity {
@@ -27,6 +57,12 @@ class Sim {
     id = 0;
     /** Current Time of Simulation */
     simTime = -1;
+    /** Current date and time in the simulation */
+    currentDate: DateTime;
+    /** Base date and time for calculation of the current date */
+    baseDate: DateTime;
+    /** The time the date increases for every step (ms)*/
+    dateStep = 1000;
     /** The time a second in the simulation should last in real time (ms) */
     timeStepDuration = 1000;
     /** The entities in the simulation */
@@ -46,6 +82,7 @@ class Sim {
     startSimulationTime!: number;
     totalSimulationTime!: number;
     logger!: (msg: string) => void;
+    logDate = false;
     random: Random;
 
     /**
@@ -55,6 +92,8 @@ class Sim {
     constructor(seed: number) {
         this.random = new Random(seed);
         this.entities = [];
+        this.currentDate = DateTime.now();
+        this.baseDate = DateTime.now();
     }
 
     /**
@@ -152,6 +191,9 @@ class Sim {
         const endTime = options.endTime;
         const maxEvents = options.maxEvents || Infinity;
         const realTime = options.realTime || false;
+        this.logDate = options.logDate || false;
+        this.baseDate = options.date ? DateTime.fromObject((options.date.dateTimeObject ? options.date.dateTimeObject : {millisecond: 0}), (options.date.dateTimeOpts ? options.date.dateTimeOpts : {})) : DateTime.now();
+        this.currentDate = this.baseDate;
         this.simTime = 0;
         this.startSimulationTime = Date.now();
         let eventCount = 0;
@@ -177,7 +219,10 @@ class Sim {
                     continue innerLoop;
                 }
                 // Advance simulation time
-                this.simTime = ro.deliverAt;
+                if (ro.deliverAt !== this.simTime) {
+                    this.simTime = ro.deliverAt;
+                    this.currentDate = this.baseDate.plus(<DateTimeObject>{millisecond: this.simTime * this.dateStep})
+                }
                 // If this event is already cancelled, ignore
                 if (ro.cancelled) continue innerLoop;
                 ro.deliver();
@@ -249,6 +294,29 @@ class Sim {
     }
 
     /**
+     * 
+     * @returns the current dateTime object
+     */
+    getDateTime(): DateTime {
+        return this.currentDate;
+    }
+
+    /**
+     * 
+     * @returns formatted dateTime with format `dd.LL.y HH:mm:ss.SSS` --> `05.01.2019 14:06:59.021`
+     */
+    getFormattedDateTime(): string {
+        return this.currentDate.toFormat("dd.LL.y HH:mm:ss.SSS");
+    }
+
+    getLogTime(): string {
+        if (this.logDate) {
+            if (this.simTime >= 0) return this.getFormattedDateTime();
+        } else if (this.simTime >= 0) return this.simTime.toFixed(6);
+        return "";
+    }
+
+    /**
      *
      * @param message
      * @param entity
@@ -263,13 +331,17 @@ class Sim {
                 entityMsg = '[' + entity.id + ']';
             }
         }
-        this.logger((this.simTime < 0 ? "" : this.simTime.toFixed(6) + " ")
+        let timestamp = this.getLogTime() + " ";
+        if (this.simTime < 0) {
+            timestamp = timestamp.slice(0, -1);
+        }
+        this.logger(timestamp
             + entityMsg
-            + '\t'
+            + ' '
             + message);
     }
 }
 
 export {
-    Sim, SimOptions, LoggableEntity,
+    Sim, SimOptions, LoggableEntity, DateOpts, DateTimeObject, DateTimeOpts
 };
