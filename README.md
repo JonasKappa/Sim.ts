@@ -25,3 +25,4 @@ The original library is licensed under the LGPL, so this lib is LGPL as well.
 - added a `getTop` method to the SimPQueue class
 - added some tests
 - `SimPQueue` checks the `SimRequest`s `priority` for ordering the requests
+- Simulation now suports dateTime via the luxon framework. Now you can set a dateTime and also log with this instead with simtime. The dateTime is useful if you want your Entities in the simulation behave differently, wether date or time it is
