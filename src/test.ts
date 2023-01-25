@@ -25,9 +25,14 @@ async function simulation(options: SimulationOptions): Promise<void> {
     const sim = new Sim(seed);
     sim.timeStepDuration = options.timestepDuration || 1000;
     const cashier = new SimFacility();
-    const buffet = new SimBuffer('Buffet', options.buffetCapacity);
+    const buffet = new SimBuffer("Buffet", options.buffetCapacity);
     const chef = new Chef(buffet, options.preparationTime);
-    const customer = new Customer(buffet, cashier, options.meanArrival, options.cashierTime);
+    const customer = new Customer(
+        buffet,
+        cashier,
+        options.meanArrival,
+        options.cashierTime
+    );
 
     sim.addEntity(chef);
     sim.addEntity(customer);
@@ -36,20 +41,41 @@ async function simulation(options: SimulationOptions): Promise<void> {
         console.log(msg);
     });
 
-    await sim.simulate({ endTime: simtime, realTime: options.realtime, logDate: true, date: {dateTimeObject:{year: 1998, month: 12, day: 10, hour: 23, minute: 57, second: 0, millisecond: 0}} });
+    await sim.simulate({
+        endTime: simtime,
+        realTime: options.realtime,
+        logDate: true,
+        date: {
+            dateTimeObject: {
+                year: 1998,
+                month: 12,
+                day: 10,
+                hour: 23,
+                minute: 57,
+                second: 0,
+                millisecond: 0,
+            },
+        },
+    });
     const stats = customer.getStats();
     console.log(`
-Durchschnittliche Wartezeit:            ${(stats.durationSeries.average() / 60).toFixed(2)} min 
-Standardabweichung Wartezeit:           ${(stats.durationSeries.deviation() / 60).toFixed(2)} min
+Durchschnittliche Wartezeit:            ${(
+        stats.durationSeries.average() / 60
+    ).toFixed(2)} min 
+Standardabweichung Wartezeit:           ${(
+        stats.durationSeries.deviation() / 60
+    ).toFixed(2)} min
 Durchschnittliche Warteschlangenlänge:  ${stats.sizeSeries.average().toFixed(2)}
-Standardabweichung Warteschlangenlänge: ${stats.sizeSeries.deviation().toFixed(2)}
+Standardabweichung Warteschlangenlänge: ${stats.sizeSeries
+        .deviation()
+        .toFixed(2)}
 Maximale Warteschlangenlänge:           ${stats.sizeSeries.max()}
 Simulationszeit:                        ${formatTime(sim.totalSimulationTime)}
 `);
 }
 
 class Chef extends Entity {
-    public name = 'Chef';
+    public name = "Chef";
     private buffet: SimBuffer;
     private preparationTime: number;
 
@@ -68,13 +94,16 @@ class Chef extends Entity {
      *
      */
     public start(): void {
-        this.putBuffer(this.buffet, this.buffet.capacity - this.buffet.current());
+        this.putBuffer(
+            this.buffet,
+            this.buffet.capacity - this.buffet.current()
+        );
         this.setTimer(this.preparationTime).done(() => this.start());
     }
 }
 
 class Customer extends Entity {
-    public name = 'Customer';
+    public name = "Customer";
     private meanArrival: number;
     private cashierTime: number;
     private buffet: SimBuffer;
@@ -87,7 +116,12 @@ class Customer extends Entity {
      * @param meanArrival The mean time between customer arrival
      * @param cashierTime The mean time the cashier needs to fullfill the service
      */
-    constructor(buffet: SimBuffer, cashier: SimFacility, meanArrival: number, cashierTime: number) {
+    constructor(
+        buffet: SimBuffer,
+        cashier: SimFacility,
+        meanArrival: number,
+        cashierTime: number
+    ) {
         super();
         this.meanArrival = meanArrival;
         this.buffet = buffet;
@@ -115,19 +149,29 @@ class Customer extends Entity {
         this.getBuffer(this.buffet, 1)
             .done(() => {
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                this.log(`Customer at CASHIER ${this.logTime()} (entered at ${this.callbackData.logTime})`);
+                this.log(
+                    `Customer at CASHIER ${this.logTime()} (entered at ${
+                        this.callbackData.logTime
+                    })`
+                );
 
-                const serviceTime = this.random.exponential(1.0 / this.cashierTime);
+                const serviceTime = this.random.exponential(
+                    1.0 / this.cashierTime
+                );
                 this.useFacility(this.cashier, serviceTime)
                     .done(() => {
                         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        this.log(`Customer LEAVE at ${this.logTime()} (entered at ${this.callbackData.logTime})`);
+                        this.log(
+                            `Customer LEAVE at ${this.logTime()} (entered at ${
+                                this.callbackData.logTime
+                            })`
+                        );
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                         this.stats.leave(this.callbackData.time, this.time());
                     })
                     .setData(this.callbackData);
             })
-            .setData({time: this.time(), logTime: this.logTime()});
+            .setData({ time: this.time(), logTime: this.logTime() });
     }
 }
 
@@ -140,8 +184,10 @@ simulation({
     cashierTime: 15,
     meanArrival: 40,
     preparationTime: 5 * 60,
-}).then((res) => {
-    console.log('done');
-}).catch((err) => {
-    console.log(err);
 })
+    .then((res) => {
+        console.log("done");
+    })
+    .catch((err) => {
+        console.log(err);
+    });

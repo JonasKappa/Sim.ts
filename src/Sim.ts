@@ -3,11 +3,11 @@
  * License: LGPL
  */
 
-import { DateTime } from 'luxon';
-import { Entity } from './Entity';
-import { Random } from './Random';
-import { SimPQueue } from './SimQueue';
-import { SimRequest } from './SimRequest';
+import { DateTime } from "luxon";
+import { Entity } from "./Entity";
+import { Random } from "./Random";
+import { SimPQueue } from "./SimQueue";
+import { SimRequest } from "./SimRequest";
 
 interface DateTimeObject {
     year?: number;
@@ -81,7 +81,7 @@ class Sim {
     data: any;
     startSimulationTime!: number;
     totalSimulationTime!: number;
-    logger!: (msg: string) => void;
+    logger!: (...args: any[]) => void;
     logDate = false;
     random: Random;
 
@@ -97,7 +97,7 @@ class Sim {
     }
 
     /**
-     * 
+     *
      * @returns The current simTime
      */
     time(): number {
@@ -105,7 +105,7 @@ class Sim {
     }
 
     /**
-     * Sends a `this.msg` from `this.source` to entities within `this.data`. 
+     * Sends a `this.msg` from `this.source` to entities within `this.data`.
      * If `this.data` is undefined then send it to every entity in the simulation
      */
     sendMessage(): void {
@@ -119,13 +119,15 @@ class Sim {
             for (let i = sim.entities.length - 1; i >= 0; i--) {
                 const entity = sim.entities[i];
                 if (entity === sender) continue;
-                if (entity.onMessage) entity.onMessage.call(entity, sender, message);
+                if (entity.onMessage)
+                    entity.onMessage.call(entity, sender, message);
             }
         } else if (entities instanceof Array) {
             for (let i = entities.length - 1; i >= 0; i--) {
                 const entity = entities[i];
                 if (entity === sender) continue;
-                if (entity.onMessage) entity.onMessage.call(entity, sender, message);
+                if (entity.onMessage)
+                    entity.onMessage.call(entity, sender, message);
             }
         } else {
             if (entities.onMessage) {
@@ -135,7 +137,7 @@ class Sim {
     }
 
     /**
-     * Creates an entity from a IProto object, adds it to the sim, 
+     * Creates an entity from a IProto object, adds it to the sim,
      * runs the start method of the entity and returns the entity
      * @param entity An object which should be added to the sim
      * @param {...any} args
@@ -161,8 +163,8 @@ class Sim {
      * @returns Returns a promise that will be fulfilled after the sleep
      */
     sleep(msec: number): Promise<void> {
-        if (msec <= 0) return new Promise(resolve => resolve());
-        return new Promise(resolve => setTimeout(resolve, msec));
+        if (msec <= 0) return new Promise((resolve) => resolve());
+        return new Promise((resolve) => setTimeout(resolve, msec));
     }
 
     /**
@@ -175,7 +177,8 @@ class Sim {
         const deliverTime = firstEvent.deliverAt;
         events.push(firstEvent);
         while (this.queue.getTop() !== undefined) {
-            if (this.queue.getTop().deliverAt === deliverTime) events.push(this.queue.remove());
+            if (this.queue.getTop().deliverAt === deliverTime)
+                events.push(this.queue.remove());
             else break;
         }
         return events;
@@ -192,7 +195,14 @@ class Sim {
         const maxEvents = options.maxEvents || Infinity;
         const realTime = options.realTime || false;
         this.logDate = options.logDate || false;
-        this.baseDate = options.date ? DateTime.fromObject((options.date.dateTimeObject ? options.date.dateTimeObject : {millisecond: 0}), (options.date.dateTimeOpts ? options.date.dateTimeOpts : {})) : DateTime.now();
+        this.baseDate = options.date
+            ? DateTime.fromObject(
+                  options.date.dateTimeObject
+                      ? options.date.dateTimeObject
+                      : { millisecond: 0 },
+                  options.date.dateTimeOpts ? options.date.dateTimeOpts : {}
+              )
+            : DateTime.now();
         this.currentDate = this.baseDate;
         this.simTime = 0;
         this.startSimulationTime = Date.now();
@@ -201,11 +211,10 @@ class Sim {
         while (true) {
             const startStepTime = Date.now();
             const events = this.nextEvents();
-            if (events.length <= 0) break; 
+            if (events.length <= 0) break;
             let cancel = false;
             const oldSimTime = this.simTime;
-            innerLoop:
-            for(let i = 0; i < events.length; i++) {
+            innerLoop: for (let i = 0; i < events.length; i++) {
                 const ro = events[i];
                 if (cancel) continue innerLoop;
                 eventCount++;
@@ -221,17 +230,21 @@ class Sim {
                 // Advance simulation time
                 if (ro.deliverAt !== this.simTime) {
                     this.simTime = ro.deliverAt;
-                    this.currentDate = this.baseDate.plus(<DateTimeObject>{millisecond: this.simTime * this.dateStep})
+                    this.currentDate = this.baseDate.plus(<DateTimeObject>{
+                        millisecond: this.simTime * this.dateStep,
+                    });
                 }
                 // If this event is already cancelled, ignore
                 if (ro.cancelled) continue innerLoop;
                 ro.deliver();
             }
             if (cancel) break;
-            
+
             if (realTime) {
                 const deltaSimTime = this.simTime - oldSimTime;
-                const sleepTime = this.timeStepDuration * deltaSimTime - (Date.now() - startStepTime);
+                const sleepTime =
+                    this.timeStepDuration * deltaSimTime -
+                    (Date.now() - startStepTime);
                 if (sleepTime > 0) {
                     await this.sleep(sleepTime);
                 }
@@ -289,12 +302,12 @@ class Sim {
      *
      * @param logger
      */
-    setLogger(logger: (msg: string) => void): void {
+    setLogger(logger: (...args: any[]) => void): void {
         this.logger = logger;
     }
 
     /**
-     * 
+     *
      * @returns the current dateTime object
      */
     getDateTime(): DateTime {
@@ -302,7 +315,7 @@ class Sim {
     }
 
     /**
-     * 
+     *
      * @returns formatted dateTime with format `dd.LL.y HH:mm:ss.SSS` --> `05.01.2019 14:06:59.021`
      */
     getFormattedDateTime(): string {
@@ -323,25 +336,27 @@ class Sim {
      */
     log(message: string, entity?: LoggableEntity): void {
         if (!this.logger) return;
-        let entityMsg = '';
+        let entityMsg = "";
         if (entity !== undefined) {
             if (entity.name) {
-                entityMsg = '[' + entity.name + ']';
+                entityMsg = "[" + entity.name + "]";
             } else {
-                entityMsg = '[' + entity.id + ']';
+                entityMsg = "[" + entity.id + "]";
             }
         }
         let timestamp = this.getLogTime() + " ";
         if (this.simTime < 0) {
             timestamp = timestamp.slice(0, -1);
         }
-        this.logger(timestamp
-            + entityMsg
-            + ' '
-            + message);
+        this.logger(timestamp + entityMsg + " " + message);
     }
 }
 
 export {
-    Sim, SimOptions, LoggableEntity, DateOpts, DateTimeObject, DateTimeOpts
+    Sim,
+    SimOptions,
+    LoggableEntity,
+    DateOpts,
+    DateTimeObject,
+    DateTimeOpts,
 };
