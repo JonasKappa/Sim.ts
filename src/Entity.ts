@@ -2,14 +2,14 @@
  * Author: Jonas Kappa (jkappa@gmx.de)
  * License: LGPL
  */
-import { Random } from './Random';
-import { Sim } from './Sim';
-import { SimBuffer } from './SimBuffer';
-import { SimEvent } from './SimEvent';
-import { SimFacility } from './SimFacility';
-import { SimPopulation } from './SimPopulation';
-import { SimRequest } from './SimRequest';
-import { SimStore } from './SimStore';
+import { Random } from "./Random";
+import { Sim } from "./Sim";
+import { SimBuffer } from "./SimBuffer";
+import { SimEvent } from "./SimEvent";
+import { SimFacility } from "./SimFacility";
+import { SimPopulation } from "./SimPopulation";
+import { SimRequest } from "./SimRequest";
+import { SimStore } from "./SimStore";
 
 interface Entity {
     finalize?: () => void;
@@ -48,8 +48,8 @@ abstract class Entity {
     }
 
     /**
-     * 
-     * @param random 
+     *
+     * @param random
      */
     public setRandom(random: Random): void {
         this.random = random;
@@ -63,7 +63,8 @@ abstract class Entity {
         const ro: SimRequest<Entity> = new SimRequest(
             this,
             this.time(),
-            this.time() + duration);
+            this.time() + duration
+        );
         ro.priority = this.priority;
         this.sim.queue.insert(ro);
         return ro;
@@ -150,7 +151,10 @@ abstract class Entity {
      * @param store
      * @param filter
      */
-    getStore(store: SimStore<any>, filter: (every: any) => boolean): SimRequest<Entity> {
+    getStore(
+        store: SimStore<any>,
+        filter: (every: any) => boolean
+    ): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(this, this.sim.time(), 0);
         ro.priority = this.priority;
         ro.source = store;
@@ -165,7 +169,11 @@ abstract class Entity {
      * @param entities
      */
     send(message: any, delay: number, entities: Entity[]): void {
-        const ro: SimRequest<Sim> = new SimRequest(this.sim, this.time(), this.time() + delay);
+        const ro: SimRequest<Sim> = new SimRequest(
+            this.sim,
+            this.time(),
+            this.time() + delay
+        );
         ro.priority = this.priority;
         ro.source = this;
         ro.msg = message;
@@ -180,11 +188,9 @@ abstract class Entity {
      * @param message
      */
     log(message: string) {
+        if (!this.sim) return;
         this.sim.log(message, this);
     }
 }
 
-
-export {
-    Entity,
-};
+export { Entity };
