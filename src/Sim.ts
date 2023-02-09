@@ -84,16 +84,24 @@ class Sim {
     logger!: (...args: any[]) => void;
     logDate = false;
     random: Random;
+    dateTimeSet = false;
 
     /**
      *
      * @param seed
+     * @param dateTime
      */
     constructor(seed: number) {
         this.random = new Random(seed);
         this.entities = [];
         this.currentDate = DateTime.now();
-        this.baseDate = DateTime.now();
+        this.baseDate = DateTime.fromISO(this.currentDate.toISO());
+    }
+
+    setDateTime(dateTime: DateTime): void {
+        this.dateTimeSet = true;
+        this.baseDate = DateTime.fromISO(dateTime.toISO());
+        this.currentDate = DateTime.fromISO(dateTime.toISO());
     }
 
     /**
@@ -195,15 +203,18 @@ class Sim {
         const maxEvents = options.maxEvents || Infinity;
         const realTime = options.realTime || false;
         this.logDate = options.logDate || false;
-        this.baseDate = options.date
-            ? DateTime.fromObject(
-                  options.date.dateTimeObject
-                      ? options.date.dateTimeObject
-                      : { millisecond: 0 },
-                  options.date.dateTimeOpts ? options.date.dateTimeOpts : {}
-              )
-            : DateTime.now();
-        this.currentDate = this.baseDate;
+        if (options.date) {
+            this.baseDate = DateTime.fromObject(
+                options.date.dateTimeObject
+                    ? options.date.dateTimeObject
+                    : { millisecond: 0 },
+                options.date.dateTimeOpts ? options.date.dateTimeOpts : {}
+            );
+        } else if (!this.dateTimeSet) {
+            this.baseDate = DateTime.now();
+            this.baseDate.set({ millisecond: 0 });
+        }
+        this.currentDate = DateTime.fromISO(this.baseDate.toISO());
         this.simTime = 0;
         this.startSimulationTime = Date.now();
         let eventCount = 0;
