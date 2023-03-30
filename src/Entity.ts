@@ -58,14 +58,15 @@ abstract class Entity {
     /**
      *
      * @param duration
+     * @param priority if the priority should be something other than `this.priority`
      */
-    setTimer(duration: number): SimRequest<Entity> {
+    setTimer(duration: number, priority?: number): SimRequest<Entity> {
         const ro: SimRequest<Entity> = new SimRequest(
             this,
             this.time(),
             this.time() + duration
         );
-        ro.priority = this.priority;
+        ro.priority = priority ? priority : this.priority;
         this.sim.queue.insert(ro);
         return ro;
     }
