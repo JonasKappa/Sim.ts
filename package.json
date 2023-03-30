@@ -10,7 +10,10 @@
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "version": "git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "update_patch": "npm version patch && npm publish",
+    "update_minor": "npm version minor && npm publish",
+    "update_major": "npm version major && npm publish"
   },
   "author": "Jonas Kappa",
   "license": "SEE LICENSE IN LICENSE",
