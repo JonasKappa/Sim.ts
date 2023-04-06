@@ -1,6 +1,6 @@
 {
   "name": "@jonaskappa/simts",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "A library heavily based on the [Sim.js lib](https://simjs.z5.web.core.windows.net/), developed by Maneesh Varshney. In fact, Sim.js was downloaded and rewritten into typescipt. It does not support all the features of the original library, because some raised errors and were not needed anyways.",
   "main": "lib/index.js",
   "scripts": {
